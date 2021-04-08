@@ -2,6 +2,10 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import datetime
+import gspread
+from google.oauth2.service_account import Credentials
+from gspread_dataframe import get_as_dataframe, set_with_dataframe
+
 
 def get_data_udemy():
     data_udemy = {}
@@ -22,12 +26,33 @@ def get_data_udemy():
     }
 
 def main():
+    scopes = [
+        'https://www.googleapis.com/auth/spreadsheets',
+        'https://www.googleapis.com/auth/drive'
+    ]
+    credentials = Credentials.from_service_account_file(
+        'service_account.json',
+        scopes=scopes
+    )
+    gc = gspread.authorize(credentials)    
+    SP_SHEET_KEY = '1MlEQ5RfMJanndDRZVdpxRR7QMxThs0nbbvcFUGhovpk'
+    sh = gc.open_by_key(SP_SHEET_KEY)    
+    
+    SP_SHEET = 'db'
+    worksheet = sh.worksheet(SP_SHEET)    
+    data= worksheet.get_all_values()
+    df = pd.DataFrame(data[1:], columns=data[0])
+    
     data_udemy = get_data_udemy()
+
     today = datetime.date.today()
     data_udemy['date'] = datetime.date.today().strftime('%Y/%m/%d')    
-    df = pd.read_csv('data.csv')
     df = df.append(data_udemy, ignore_index=True)
-    df.to_csv('data.csv', index=False)
-
+    
+    first_row = 1
+    first_col = 1
+    
+    set_with_dataframe(worksheet, df, row=first_row, col=first_col)
+    
 if __name__ == '__main__':
     main()
