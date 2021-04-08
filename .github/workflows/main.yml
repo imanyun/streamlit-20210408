@@ -19,9 +19,7 @@ jobs:
           python-version: 3.8
       - name: Install dependencies
         run: |
-        # pip更新
           python -m pip install --upgrade pip
-        # 必要なパッケージインストール
           pip install -r requirements.txt
       - name: Run script
         run: |
