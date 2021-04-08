@@ -25,9 +25,10 @@ def main():
     data_udemy = get_data_udemy()
     today = datetime.date.today()
     data_udemy['date'] = datetime.date.today().strftime('%Y/%m/%d')    
+    print('data_udemy', data_udemy)
     df = pd.read_csv('data.csv')
     df = df.append(data_udemy, ignore_index=True)
+    print('df', df)
     df.to_csv('data.csv', index=False)
-
 if __name__ == '__main__':
     main()
